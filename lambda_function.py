@@ -43,3 +43,4 @@ def lambda_handler(event, context):
         },
 		MessageBody= ('Letticia letticia')
 		)
+	print('letticia')
