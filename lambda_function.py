@@ -35,5 +35,5 @@ def lambda_handler(event, context):
 
     # S3 bucket for storing result file
 	s3_bucket = 'resultmoviebucket'
-	s3_client.put_object(Bucket = s3_bucket, Key = 'Sample.json', Body = resultFile)
+	s3_client.put_object(Bucket = s3_bucket, Key = 'Top10Movies.json', Body = resultFile)
 	print('file updated 1')
