@@ -1,7 +1,4 @@
-from asyncio.windows_events import NULL
 import json
-from operator import ge
-from webbrowser import get
 import boto3
 import urllib3
 
