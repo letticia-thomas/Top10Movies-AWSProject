@@ -13,27 +13,28 @@ def lambda_handler(event, context):
    
     # retrieving message from event
 	records = event['Records']
-	message = records[0]
-	messageAtt = message['messageAttributes']
-	movies = messageAtt['movies']
-	movieIds = movies['stringValue']
+	message_info = records[0]
+	message_attribute = message_info['messageAttributes']
+	movies = message_attribute['movies']
+	movie_ids = movies['stringValue']
+
     # fetching movie id from Message arguments
-	movieIdList = list(movieIds.split("-"))
+	movie_id_list = list(movie_ids.split("-"))
 
     # getting more information using imDb API
 	http = urllib3.PoolManager()
-	topMovieList =[]
-	for movie_id in movieIdList:
+	top_movie_list =[]
+	for movie_id in movie_id_list:
 		if (movie_id != ''):
 			api_url = "http://www.omdbapi.com/?i="+movie_id+"&apikey=d5b71946"
 			r = http.request('GET', api_url)
 			response = r.data.decode("utf-8")
-			responseLoad = json.loads(response)
-			topMovieList.append(responseLoad)
-	topMovieDictionary = {'items' : topMovieList}
-	resultFile = json.dumps(topMovieDictionary)
+			response_load = json.loads(response)
+			top_movie_list.append(response_load)
+	top_movie_dictionary = {'items' : top_movie_list}
+	result_file = json.dumps(top_movie_dictionary)
 
     # S3 bucket for storing result file
 	s3_bucket = 'resultmoviebucket'
-	s3_client.put_object(Bucket = s3_bucket, Key = 'Top10Movies.json', Body = resultFile)
-	print('file updated 1')
+	s3_client.put_object(Bucket = s3_bucket, Key = 'Top10Movies.json', Body = result_file)
+	print('file updated')

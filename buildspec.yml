@@ -13,8 +13,8 @@ phases:
       - zip -r9 ../deployment_packageRead.zip .
       - zip -r9 ../deployment_packageEnrich.zip .
       - cd ..
-      - zip -g deployment_packageRead.zip lambdaFcnReadMovies.py
-      - zip -g deployment_packageEnrich.zip lambdaFcnEnrich.py
+      - zip -g deployment_packageRead.zip lambda_fcn_read_movies.py
+      - zip -g deployment_packageEnrich.zip lambda_fcn_enrich_store.py
   post_build:
     commands:
       - echo "Updating lambda Function..."
