@@ -1,46 +1,39 @@
-import boto3
 import json
-import locale
+import boto3
+import urllib3
+
+# creating boto3 client for accessing s3 bucket
+s3_client = boto3.client('s3')
+# creating boto3 client for accessing SQS
+sqs = boto3.client('sqs',endpoint_url = 'https://sqs.eu-central-1.amazonaws.com')
+
+# This lambda function will get triggered when message is updated in SQS queue
 
 def lambda_handler(event, context):
-	# creating boto3 client for accessing s3 bucket
-	s3_client = boto3.client("s3")
-	# creating boto3 client for accessing SQS
-	sqs = boto3.client('sqs',endpoint_url = 'https://sqs.eu-central-1.amazonaws.com')
+   
+    # retrieving message from event
+	records = event['Records']
+	message = records[0]
+	messageAtt = message['messageAttributes']
+	movies = messageAtt['movies']
+	movieIds = movies['stringValue']
+    # fetching movie id from Message arguments
+	movieIdList = list(movieIds.split("-"))
 
-	# json file consisting of top 250 movies stored in this bucket
-	S3_BUCKET = 'letticiaawsbucket'
-	object_key = "Top250Movies.json"
-	# SQS queue 'topMovieQueue' for sending message
-	queue_url = 'https://sqs.eu-central-1.amazonaws.com/911776993970/topMovieQueue'
-	
-	# Reading json file from s3 bucket
-	file_content = s3_client.get_object(
-		Bucket=S3_BUCKET, Key=object_key)
-	
-	# converting JSON string to python dictionary
-	json_data = json.loads(file_content["Body"].read().decode("utf-8"))
-	items = json_data['items']
+    # getting more information using imDb API
+	http = urllib3.PoolManager()
+	topMovieList =[]
+	for movie_id in movieIdList:
+		if (movie_id != ''):
+			api_url = "http://www.omdbapi.com/?i="+movie_id+"&apikey=d5b71946"
+			r = http.request('GET', api_url)
+			response = r.data.decode("utf-8")
+			responseLoad = json.loads(response)
+			topMovieList.append(responseLoad)
+	topMovieDictionary = {'items' : topMovieList}
+	resultFile = json.dumps(topMovieDictionary)
 
-	# sorting list of movies using imDb rating
-	items.sort(key=lambda x: int(locale.atof(x['imDbRating'])))
-
-	# sorted ids appending to string
-	sorted_ids=''
-	for x in range(10):
-		sorted_ids += items[x]["id"]
-		sorted_ids = sorted_ids + '-'
-	
-	# sending message to SQS using sorted id as attribute
-	response = sqs.send_message(
-		QueueUrl=queue_url,
-		DelaySeconds=10,
-		MessageAttributes={
-        	'movies': {
-            	'DataType': 'String',
-            	'StringValue': sorted_ids
-        	}
-        },
-		MessageBody= ('Sending Message')
-		)
-	print('Message send successfully')
+    # S3 bucket for storing result file
+	s3_bucket = 'resultmoviebucket'
+	s3_client.put_object(Bucket = s3_bucket, Key = 'Sample.json', Body = resultFile)
+	print('file updated 1')
