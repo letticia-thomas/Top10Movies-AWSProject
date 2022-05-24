@@ -12,15 +12,9 @@ phases:
       - cd lib
       - zip -r9 ../deployment_package.zip .
       - cd ..
-      - pip install -r requirements.txt -t lib2
-      - cd lib2
-      - zip -r9 ../deployment_package1.zip .
-      - cd ..
       - zip -g deployment_package.zip lambda_function.py
-      - zip -g deployment_package1.zip lambda_function2.py
   post_build:
     commands:
       - echo "Updating lambda Function..."
-      - aws lambda update-function-code --function-name movies --zip-file fileb://deployment_package.zip
-      - aws lambda update-function-code --function-name enrichstore --zip-file fileb://deployment_package1.zip
+      - aws lambda update-function-code --function-name github-to-lambda-demo --zip-file fileb://deployment_package.zip
       - echo "DONE!!"
