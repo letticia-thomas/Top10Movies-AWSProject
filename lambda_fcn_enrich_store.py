@@ -7,9 +7,12 @@ def get_more_imdb_info(imdb_id):
 
 	http = urllib3.PoolManager()
 	api_url = "http://www.omdbapi.com/?i="+imdb_id+"&apikey=d5b71946"
-	response_raw = http.request('GET', api_url)
-	response_formatted = response_raw.data.decode("utf-8")
-	return(response_formatted)
+	try:
+		response_raw = http.request('GET', api_url)
+		response_formatted = response_raw.data.decode("utf-8")
+		return(response_formatted)
+	except:
+  		print("API is not returning any data") 
 
 def get_movie_ids_from_SQS_event(event):
 	# retrieving message from event
@@ -25,7 +28,7 @@ def get_movie_ids_from_SQS_event(event):
 
 def enrich_movie_list(movie_id_list):
 	# create list of top 10 movies with enriched data
-	
+
 	top_movie_list = []
 	for movie_id in movie_id_list:
 		if (movie_id != ''):
