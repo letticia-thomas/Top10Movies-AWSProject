@@ -41,5 +41,5 @@ def lambda_handler(event, context):
             	'StringValue': sorted_ids
         	}
         },
-		MessageBody= ('Message send successfully')
+		MessageBody= ('Letticia letticia')
 		)
