@@ -43,5 +43,3 @@ def lambda_handler(event, context):
         },
 		MessageBody= ('Message send successfully')
 		)
-	print(sorted_ids)
-	print('sending message successfully')
